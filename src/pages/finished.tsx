@@ -1,8 +1,10 @@
+import { format } from 'date-fns';
 import { GetStaticProps } from "next";
 import { useState } from "react";
-import { Match } from '../@types';
+import { Match, MatchDatabase } from "../@types";
 import { Header } from "../components/Header";
 import { MatchCard } from "../components/MatchCard";
+import { api } from "../lib/api";
 
 interface FinishedProps {
   matches: Match[];
@@ -11,7 +13,7 @@ interface FinishedProps {
 export default function Finished({ matches }: FinishedProps) {
   const [searchValue, setSearchValue] = useState("");
   const filteredMatches = matches.filter(
-    match => match.awayTeam.name.toLowerCase().includes(searchValue) || match.homeTeam.name.toLowerCase().includes(searchValue)
+    match => match.away_team.toLowerCase().includes(searchValue) || match.home_team.toLowerCase().includes(searchValue)
   )
 
   return (
@@ -21,7 +23,12 @@ export default function Finished({ matches }: FinishedProps) {
       <div className="mt-8">
         <h1 className="my-4 dark:text-zinc-100 text-zinc-800 text-4xl font-bold">Partidas encerradas</h1>
         <div className="grid grid-cols-4 gap-8">
-          {filteredMatches.map(match => <MatchCard key={match.id} match={match}/>)}
+          {filteredMatches.map(match =>
+            <MatchCard
+              key={match.id}
+              {...match}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -29,9 +36,17 @@ export default function Finished({ matches }: FinishedProps) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
+  const response = await api.get<MatchDatabase[]>("/matches/finished");
+
   return {
     props: {
-      matches: []
-    }
+      matches: response.data.map(match => {
+        return {
+          ...match,
+          gameTimeDisplay: format(new Date(match.date), "dd/MM/yyyy")
+        }
+      }),
+    },
+    revalidate: 5
   }
 }

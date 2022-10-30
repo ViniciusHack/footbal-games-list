@@ -1,27 +1,27 @@
-import { differenceInMinutes } from 'date-fns';
-import { Match } from '../@types';
+import { Match } from "../@types";
 
-interface MatchCardProps {
-  match: Match;
+interface MatchCardProps extends Match {
   key: number;
+  isLive?: boolean;
 }
 
-export function MatchCard({ match, key }: MatchCardProps) {
+export function MatchCard({ key, isLive = false, gameTimeDisplay, away_team, away_score, home_score, home_team }: MatchCardProps) {
+
   return (
     <div key={key} className="p-4 dark:bg-zinc-200 rounded-2xl bg-zinc-700 dark:text-zinc-900 text-zinc-100">
       <div>
         <span className="flex justify-between">
-          <b className="text-red-600">AO VIVO</b>
-          <span>{differenceInMinutes(new Date().getTime(), match.startTimestamp * 1000)}&rsquo;</span>
+          <b className={`${isLive && "text-red-600"}`}>{isLive ? "AO VIVO" : "Encerrado"}</b>
+          <span>{gameTimeDisplay}</span>
         </span>
         <div className="flex items-center gap-2 mt-2">
-          <p>{match.homeTeam.name}</p>
+          <p>{home_team}</p>
           <b className="min-w-max text-xl">
-          {match.homeTeam.score}
+          {home_score}
             <span className="font-normal">-</span>
-          {match.awayTeam.score}
+          {away_score}
           </b>
-          <p>{match.awayTeam.name}</p>
+          <p>{away_team}</p>
         </div>
       </div>
     </div>

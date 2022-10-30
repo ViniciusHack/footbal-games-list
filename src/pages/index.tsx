@@ -1,35 +1,32 @@
+import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
-import { Match } from '../@types';
+import { Match, Match365 } from '../@types';
 import { Header } from '../components/Header';
 import { MatchCard } from '../components/MatchCard';
-import { api } from '../lib/api';
+import { externalApi } from '../lib/externalApi';
 
 export default function Home() {
   const [liveMatches, setLiveMatches] = useState<Match[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const filteredMatches = liveMatches.filter(
-    match => match.awayTeam.name.toLowerCase().includes(searchValue) || match.homeTeam.name.toLowerCase().includes(searchValue)
+    match => match.away_team.toLowerCase().includes(searchValue) || match.home_team.toLowerCase().includes(searchValue)
   )
 
   useEffect(() => {
     async function fetchFootballMatches() {
-      const response = await api.get("/live");
+      const today = format(new Date(), "dd/MM/yyyy")
+      const response = await externalApi.get<Match365>(`/?langId=31&timezoneName=America/Sao_Paulo&userCountryId=21&sports=1&startDate=${today}&endDate=${today}&onlyLiveGames=true&withTop=true`);
 
-      setLiveMatches(response.data.events.map((match: any) => {
-        const { id, homeTeam, awayTeam, homeScore, awayScore, startTimestamp } = match;
+      setLiveMatches(response.data.games.map(match => {
+        const { id, homeCompetitor, awayCompetitor, gameTimeDisplay, startTime } = match;
         return {
           id,
-          startTimestamp,
-          homeTeam: {
-            ...homeTeam,
-            name: homeTeam.shortName,
-            score: homeScore.current
-          },
-          awayTeam: {
-            ...awayTeam,
-            name: awayTeam.shortName,
-            score: awayScore.current
-          }
+          away_team: awayCompetitor.name,
+          away_score: awayCompetitor.score,
+          home_team: homeCompetitor.name,
+          home_score: homeCompetitor.score,
+          date: new Date(startTime),
+          gameTimeDisplay
         }
       }))
     }
@@ -44,7 +41,13 @@ export default function Home() {
       <div className="mt-8">
         <h1 className="my-4 dark:text-zinc-100 text-zinc-800 text-4xl font-bold">Partidas</h1>
         <div className="grid grid-cols-4 gap-8">
-          {filteredMatches.map(match => <MatchCard key={match.id} match={match}/>)}
+          {filteredMatches.map(match =>
+            <MatchCard
+              key={match.id}
+              isLive
+              {...match}
+            />
+          )}
         </div>
       </div>
     </div>
