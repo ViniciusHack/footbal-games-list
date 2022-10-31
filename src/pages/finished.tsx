@@ -36,7 +36,8 @@ export default function Finished({ matches }: FinishedProps) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const response = await api.get<MatchDatabase[]>("/matches/finished");
+  try {
+    const response = await api.get<MatchDatabase[]>("/matches/finished");
 
   return {
     props: {
@@ -48,5 +49,13 @@ export const getStaticProps: GetStaticProps = async () => {
       }),
     },
     revalidate: 60 * 5 // 5 minutes
+  }
+  } catch (err) {
+    console.error(err)
+    return {
+      props: {
+        matches: []
+      }
+    }
   }
 }
