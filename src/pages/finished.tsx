@@ -54,7 +54,8 @@ export const getStaticProps: GetStaticProps = async () => {
     console.error(err)
     return {
       props: {
-        matches: []
+        matches: [],
+        revalidate: 10
       }
     }
   }
