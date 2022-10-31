@@ -25,7 +25,7 @@
 
 
 ## 👨🏻‍💻 About the project
-**Football games list** is a page where you can see live and finished football matches
+**Football games list** is a page where you can see live football scores.
 
 ## 🔨 Features
 - List live matches
