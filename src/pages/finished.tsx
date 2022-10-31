@@ -36,7 +36,7 @@ export default function Finished({ matches }: FinishedProps) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-    const response = await api.get<MatchDatabase[]>("/matches/finished");
+  const response = await api.get<MatchDatabase[]>("/matches/finished");
 
   return {
     props: {
