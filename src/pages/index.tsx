@@ -28,7 +28,7 @@ export default function Home() {
           date: new Date(startTime),
           gameTimeDisplay
         }
-      }))
+      }).filter(match => !!match.gameTimeDisplay))
     }
 
     fetchFootballMatches()
